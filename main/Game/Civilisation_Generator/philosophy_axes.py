@@ -1,6 +1,7 @@
 from typing import Dict
 from .philosophy import Philosophy, PhilosophyEffects
 from .philosophy_enum import PhilosophyEnum
+from .philosophy_effects import SpecialEffect
 
 class PhilosophyAxis:
     def __init__(self, name: str, positive: Philosophy, negative: Philosophy):
@@ -192,11 +193,18 @@ PHILOSOPHY_AXES: Dict[str, PhilosophyAxis] = {
         "Approach",
         Philosophy(
             PhilosophyEnum.EXTREMISM.value, 
-            PhilosophyEffects(happiness=-1, production=0, money=0, resources=0, religion=1, environment=0, morale=0, fertility=0)
+            PhilosophyEffects(
+                happiness=-1, production=0, money=0, resources=0, 
+                religion=1, environment=0, morale=0, fertility=0,
+                special_effect=SpecialEffect.DOUBLE_ALL_EFFECTS
+            )
         ),
         Philosophy(
             PhilosophyEnum.MIDDLE_WAY.value, 
-            PhilosophyEffects(happiness=1, production=0, money=0, resources=0, religion=-1, environment=0, morale=0, fertility=0)
+            PhilosophyEffects(
+                happiness=1, production=0, money=0, resources=0, 
+                religion=-1, environment=0, morale=0, fertility=0
+            )
         )
     ),
     "LifestyleMotivation": PhilosophyAxis(

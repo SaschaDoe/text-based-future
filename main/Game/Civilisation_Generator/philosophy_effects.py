@@ -1,5 +1,11 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List, Optional
+from enum import Enum
+
+class SpecialEffect(Enum):
+    NONE = "none"
+    DOUBLE_ALL_EFFECTS = "double_all_effects"
+    # Add more special effects here as needed
 
 @dataclass
 class PhilosophyEffects:
@@ -11,6 +17,7 @@ class PhilosophyEffects:
     environment: int = 0
     morale: int = 0
     fertility: int = 0
+    special_effect: SpecialEffect = SpecialEffect.NONE
 
     def __post_init__(self):
         self._validate_zero_sum()

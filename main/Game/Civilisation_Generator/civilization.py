@@ -4,13 +4,14 @@ from .philosophy import Philosophy
 from .philosophy_effects import PhilosophyEffects
 from .philosophy_axes import PHILOSOPHY_AXES
 from .philosophy_enum import PhilosophyEnum
+from .philosophy_set import PhilosophySet
 
 class Civilization:
     def __init__(self):
-        self.philosophies: Dict[str, PhilosophyEnum] = {}
+        self.philosophy_set = PhilosophySet()
         
     def generate_random_philosophies(self):
-        self.philosophies.clear()
+        self.philosophy_set = PhilosophySet()
         
         # Determine number of philosophies based on probabilities
         rand = random.random() * 100
@@ -29,31 +30,12 @@ class Civilization:
         # For each axis, randomly choose either positive or negative philosophy
         for axis_name, axis in selected_axes:
             if random.random() < 0.5:
-                self.philosophies[axis_name] = axis.pole1.name
+                self.philosophy_set.add_philosophy(axis_name, axis.pole1.name)
             else:
-                self.philosophies[axis_name] = axis.pole2.name
+                self.philosophy_set.add_philosophy(axis_name, axis.pole2.name)
                 
     def get_philosophy_names(self) -> List[str]:
-        return [philosophy.value for philosophy in self.philosophies.values()]
+        return [philosophy.value for philosophy in self.philosophy_set.philosophies.values()]
     
-    def get_total_effects(self) -> Dict[str, int]:
-        total = PhilosophyEffects()
-        
-        for axis_name, philosophy_enum in self.philosophies.items():
-            # Find the philosophy in the axis
-            axis = PHILOSOPHY_AXES[axis_name]
-            if axis.pole1.name == philosophy_enum:
-                philosophy = axis.pole1
-            else:
-                philosophy = axis.pole2
-                
-            total.happiness += philosophy.effects.happiness
-            total.production += philosophy.effects.production
-            total.money += philosophy.effects.money
-            total.resources += philosophy.effects.resources
-            total.religion += philosophy.effects.religion
-            total.environment += philosophy.effects.environment
-            total.morale += philosophy.effects.morale
-            total.fertility += philosophy.effects.fertility
-                
-        return total.to_dict() 
+    def get_total_effects(self) -> Dict[str, float]:
+        return self.philosophy_set.get_total_effects() 

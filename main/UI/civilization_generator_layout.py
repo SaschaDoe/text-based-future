@@ -101,7 +101,7 @@ class CivilizationGenerator(QWidget):
         self.philosophy_list.clear()
         
         # Add new items
-        for axis_name, philosophy_name in self.civilization.philosophies.items():
+        for axis_name, philosophy_name in self.civilization.philosophy_set.philosophies.items():
             item = QListWidgetItem(f"{axis_name}: {philosophy_name}")
             self.philosophy_list.addItem(item)
             
