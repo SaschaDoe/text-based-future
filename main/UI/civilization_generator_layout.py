@@ -21,6 +21,10 @@ class CivilizationGenerator(QWidget):
         layout.addWidget(title)
         
         # Create list widget for philosophies
+        philosophy_label = QLabel("Philosophies:")
+        philosophy_label.setStyleSheet("color: #00ffff; font-size: 16px;")
+        layout.addWidget(philosophy_label)
+        
         self.philosophy_list = QListWidget()
         self.philosophy_list.setStyleSheet("""
             QListWidget {
@@ -36,6 +40,27 @@ class CivilizationGenerator(QWidget):
             }
         """)
         layout.addWidget(self.philosophy_list)
+        
+        # Create list widget for backgrounds
+        background_label = QLabel("Backgrounds:")
+        background_label.setStyleSheet("color: #00ffff; font-size: 16px;")
+        layout.addWidget(background_label)
+        
+        self.background_list = QListWidget()
+        self.background_list.setStyleSheet("""
+            QListWidget {
+                background-color: #1a1a3a;
+                color: #00ffff;
+                border: 2px solid #00ffff;
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            QListWidget::item {
+                padding: 5px;
+            }
+        """)
+        layout.addWidget(self.background_list)
         
         # Create effects table
         self.effects_table = QTableWidget()
@@ -96,14 +121,21 @@ class CivilizationGenerator(QWidget):
     def generate_civilization(self):
         self.civilization = Civilization()
         self.civilization.generate_random_philosophies()
+        self.civilization.generate_backgrounds()
         
         # Clear existing items
         self.philosophy_list.clear()
+        self.background_list.clear()
         
-        # Add new items
+        # Add philosophy items
         for axis_name, philosophy_name in self.civilization.philosophy_set.philosophies.items():
             item = QListWidgetItem(f"{axis_name}: {philosophy_name}")
             self.philosophy_list.addItem(item)
+            
+        # Add background items
+        for background in self.civilization.get_backgrounds():
+            item = QListWidgetItem(f"{background.type.value}: {background.name}")
+            self.background_list.addItem(item)
             
         # Update effects
         self.update_effects()

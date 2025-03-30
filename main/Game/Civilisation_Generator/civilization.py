@@ -5,10 +5,13 @@ from .philosophy_effects import PhilosophyEffects
 from .philosophy_axes import PHILOSOPHY_AXES
 from .philosophy_enum import PhilosophyEnum
 from .philosophy_set import PhilosophySet
+from .background_generator import BackgroundGenerator, Background
 
 class Civilization:
     def __init__(self):
         self.philosophy_set = PhilosophySet()
+        self.backgrounds: List[Background] = []
+        self._background_generator = BackgroundGenerator()
         
     def generate_random_philosophies(self):
         self.philosophy_set = PhilosophySet()
@@ -34,8 +37,15 @@ class Civilization:
             else:
                 self.philosophy_set.add_philosophy(axis_name, axis.pole2.name)
                 
+    def generate_backgrounds(self):
+        """Generate random backgrounds for the civilization"""
+        self.backgrounds = self._background_generator.generate_backgrounds()
+                
     def get_philosophy_names(self) -> List[str]:
         return [philosophy.value for philosophy in self.philosophy_set.philosophies.values()]
     
     def get_total_effects(self) -> Dict[str, float]:
-        return self.philosophy_set.get_total_effects() 
+        return self.philosophy_set.get_total_effects()
+        
+    def get_backgrounds(self) -> List[Background]:
+        return self.backgrounds 
