@@ -1,17 +1,32 @@
 import random
 from typing import Dict, List
+import os
+import requests
 from .philosophy import Philosophy
 from .philosophy_effects import PhilosophyEffects
 from .philosophy_axes import PHILOSOPHY_AXES
 from .philosophy_enum import PhilosophyEnum
 from .philosophy_set import PhilosophySet
 from .background_generator import BackgroundGenerator, Background
+from .name_generator import NameGenerator, CivilizationProperties
 
 class Civilization:
     def __init__(self):
         self.philosophy_set = PhilosophySet()
         self.backgrounds: List[Background] = []
         self._background_generator = BackgroundGenerator()
+        self._name_generator = NameGenerator()
+        self.name = "Unnamed Civilization"
+        
+    def generate_name(self) -> str:
+        try:
+            properties = CivilizationProperties(
+                philosophies=[f"{axis}: {philosophy}" for axis, philosophy in self.philosophy_set.philosophies.items()],
+                backgrounds=[f"{bg.type.value}: {bg.name}" for bg in self.backgrounds]
+            )
+            return self._name_generator.generate_name(properties)
+        except Exception as e:
+            return "Unknown Civilization"
         
     def generate_random_philosophies(self):
         self.philosophy_set = PhilosophySet()

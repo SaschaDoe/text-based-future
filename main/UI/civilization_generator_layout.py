@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QTableWidget, QTableWidgetItem, QHeaderView, QListWidgetItem
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QTableWidget, QTableWidgetItem, QHeaderView, QListWidgetItem, QMessageBox
 from PySide6.QtCore import Qt
 from ..Game.Civilisation_Generator.civilisation_generator import Civilization
 
@@ -19,6 +19,17 @@ class CivilizationGenerator(QWidget):
             }
         """)
         layout.addWidget(title)
+        
+        # Add civilization name label
+        self.name_label = QLabel("Name: Unnamed Civilization")
+        self.name_label.setStyleSheet("""
+            QLabel {
+                color: #00ffff;
+                font-size: 18px;
+                font-weight: bold;
+            }
+        """)
+        layout.addWidget(self.name_label)
         
         # Create list widget for philosophies
         philosophy_label = QLabel("Philosophies:")
@@ -122,6 +133,15 @@ class CivilizationGenerator(QWidget):
         self.civilization = Civilization()
         self.civilization.generate_random_philosophies()
         self.civilization.generate_backgrounds()
+        
+        try:
+            self.civilization.name = self.civilization.generate_name()
+            self.name_label.setText(f"Name: {self.civilization.name}")
+        except Exception as e:
+            QMessageBox.critical(self, "API Error", 
+                               "Failed to generate civilization name. Please check your GROQ_API_KEY environment variable.\n"
+                               f"Error: {str(e)}")
+            self.name_label.setText("Name: Unnamed Civilization")
         
         # Clear existing items
         self.philosophy_list.clear()
