@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QTableWidget, QTableWidgetItem, QHeaderView
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QListWidget, QTableWidget, QTableWidgetItem, QHeaderView, QListWidgetItem
 from PySide6.QtCore import Qt
 from ..Game.Civilisation_Generator.civilisation_generator import Civilization
 
@@ -43,7 +43,7 @@ class CivilizationGenerator(QWidget):
         self.effects_table.setRowCount(1)
         self.effects_table.setHorizontalHeaderLabels([
             "Happiness", "Production", "Money", "Resources",
-            "Religion", "Pollution", "Morale", "Fertility"
+            "Religion", "Environment", "Morale", "Fertility"
         ])
         self.effects_table.setStyleSheet("""
             QTableWidget {
@@ -70,12 +70,45 @@ class CivilizationGenerator(QWidget):
         generate_button.clicked.connect(self.generate_civilization)
         layout.addWidget(generate_button)
         
-    def generate_civilization(self):
-        self.civilization.generate_random_philosophies()
-        self.philosophy_list.clear()
-        self.philosophy_list.addItems(self.civilization.get_philosophy_names())
+    def _create_effect_tooltip(self, philosophy):
+        effects = philosophy.effects
+        non_zero_effects = {
+            "Happiness": effects.happiness,
+            "Production": effects.production,
+            "Money": effects.money,
+            "Resources": effects.resources,
+            "Religion": effects.religion,
+            "Environment": effects.environment,
+            "Morale": effects.morale,
+            "Fertility": effects.fertility
+        }
+        non_zero_effects = {k: v for k, v in non_zero_effects.items() if v != 0}
+        if not non_zero_effects:
+            return ""
+            
+        tooltip = "<p style='margin: 0;'>Effects:</p>"
+        for effect, value in non_zero_effects.items():
+            sign = "+" if value > 0 else ""
+            color = "#00ff00" if value > 0 else "#ff0000"
+            tooltip += f"<p style='margin: 0; color: {color}'>{sign}{value} {effect}</p>"
+        return tooltip
         
-        # Update effects table
+    def generate_civilization(self):
+        self.civilization = Civilization()
+        self.civilization.generate_random_philosophies()
+        
+        # Clear existing items
+        self.philosophy_list.clear()
+        
+        # Add new items
+        for axis_name, philosophy_name in self.civilization.philosophies.items():
+            item = QListWidgetItem(f"{axis_name}: {philosophy_name}")
+            self.philosophy_list.addItem(item)
+            
+        # Update effects
+        self.update_effects()
+        
+    def update_effects(self):
         effects = self.civilization.get_total_effects()
         for i, (effect, value) in enumerate(effects.items()):
             item = QTableWidgetItem(str(value))
