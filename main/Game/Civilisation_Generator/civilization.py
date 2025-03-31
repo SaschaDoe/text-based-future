@@ -9,58 +9,40 @@ from .philosophy_enum import PhilosophyEnum
 from .philosophy_set import PhilosophySet
 from .background_generator import BackgroundGenerator, Background
 from .name_generator import NameGenerator, CivilizationProperties
+from .philosophy_manager import PhilosophyManager
+from .background_manager import BackgroundManager
 
 class Civilization:
-    def __init__(self):
-        self.philosophy_set = PhilosophySet()
-        self.backgrounds: List[Background] = []
-        self._background_generator = BackgroundGenerator()
-        self._name_generator = NameGenerator()
+    def __init__(self, 
+                 philosophy_manager: PhilosophyManager = None,
+                 background_manager: BackgroundManager = None,
+                 name_generator: NameGenerator = None):
+        self.philosophy_manager = philosophy_manager or PhilosophyManager()
+        self.background_manager = background_manager or BackgroundManager()
+        self.name_generator = name_generator or NameGenerator()
         self.name = "Unnamed Civilization"
         
     def generate_name(self) -> str:
         try:
             properties = CivilizationProperties(
-                philosophies=[f"{axis}: {philosophy}" for axis, philosophy in self.philosophy_set.philosophies.items()],
-                backgrounds=[f"{bg.type.value}: {bg.name}" for bg in self.backgrounds]
+                philosophies=self.philosophy_manager.get_formatted_philosophies(),
+                backgrounds=self.background_manager.get_formatted_backgrounds()
             )
-            return self._name_generator.generate_name(properties)
+            return self.name_generator.generate_name(properties)
         except Exception as e:
             return "Unknown Civilization"
         
     def generate_random_philosophies(self):
-        self.philosophy_set = PhilosophySet()
-        
-        # Determine number of philosophies based on probabilities
-        rand = random.random() * 100
-        if rand < 10:  # 10% chance for 1
-            num_philosophies = 1
-        elif rand < 70:  # 60% chance for 2
-            num_philosophies = 2
-        elif rand < 90:  # 20% chance for 3
-            num_philosophies = 3
-        else:  # 10% chance for 4
-            num_philosophies = 4
-            
-        # Randomly select philosophy axes
-        selected_axes = random.sample(list(PHILOSOPHY_AXES.items()), num_philosophies)
-        
-        # For each axis, randomly choose either positive or negative philosophy
-        for axis_name, axis in selected_axes:
-            if random.random() < 0.5:
-                self.philosophy_set.add_philosophy(axis_name, axis.pole1.name)
-            else:
-                self.philosophy_set.add_philosophy(axis_name, axis.pole2.name)
+        self.philosophy_manager.generate_random_philosophies()
                 
     def generate_backgrounds(self):
-        """Generate random backgrounds for the civilization"""
-        self.backgrounds = self._background_generator.generate_backgrounds()
+        self.background_manager.generate_backgrounds()
                 
     def get_philosophy_names(self) -> List[str]:
-        return [philosophy.value for philosophy in self.philosophy_set.philosophies.values()]
+        return self.philosophy_manager.get_philosophy_names()
     
     def get_total_effects(self) -> Dict[str, float]:
-        return self.philosophy_set.get_total_effects()
+        return self.philosophy_manager.get_total_effects()
         
     def get_backgrounds(self) -> List[Background]:
-        return self.backgrounds 
+        return self.background_manager.get_backgrounds() 
